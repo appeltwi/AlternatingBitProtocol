@@ -1,2 +1,3 @@
 # AlternatingBitProtocol
-Some experiments on the alternating bit protocol with tla+
+
+from the TLA+ Video Course by Leslie Lamport.
