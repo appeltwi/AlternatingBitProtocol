@@ -34,13 +34,13 @@ Init == /\ AVar \in Data \X {1}
 (* can send its next message.  Sending is described by action A and        *)
 (* receiving by action B.                                                  *)
 (***************************************************************************)
-A == /\ AVar = BVar
+A == /\ AVar[2] = BVar[2]
      /\ \E d \in Data: /\ AVar' = <<d, 1 - AVar[2]>> 
-     /\ BVar' = BVar
+     /\ UNCHANGED BVar
 
-B == /\ AVar # BVar
+B == /\ AVar[2] # BVar[2]
      /\ BVar' = AVar
-     /\ AVar' = AVar
+     /\ UNCHANGED AVar
 
 Next == A \/ B
 
@@ -78,7 +78,8 @@ THEOREM Invariance == Spec => [] Inv
                    PROVE  IndInv
         OBVIOUS
       <2>1. TypeOK BY DEF Init, TypeOK
-      <2>2. Inv BY DEF Init, TypeOK
+      <2>2. Inv BY DEF Init, TypeOK, Inv
+
       <2>3. QED
         BY <2>1, <2>2 DEF IndInv
     <1>2. IndInv /\ [Next]_vars =>  IndInv' BY DEF TypeOK, IndInv, Inv, Next, A, B, vars
@@ -88,7 +89,7 @@ THEOREM Invariance == Spec => [] Inv
 THEOREM FairSpecToSpec == FairSpec => Spec BY DEF FairSpec
 =============================================================================
 \* Modification History
-\* Last modified Sat Jan 04 20:44:19 CET 2025 by appeltwi
+\* Last modified Sun Jan 12 12:13:45 CET 2025 by appeltwi
 \* Last modified Sun Dec 29 14:21:45 CET 2024 by appeltwi
 \* Last modified Wed Oct 18 04:07:37 PDT 2017 by lamport
 \* Created Fri Sep 04 07:08:22 PDT 2015 by lamport
