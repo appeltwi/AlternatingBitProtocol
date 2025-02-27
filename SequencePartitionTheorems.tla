@@ -11,12 +11,93 @@ OrderProp1(seq1, seq2) == Ordered(seq1 \o seq2) => Ordered(seq1) /\ Ordered(seq1
 
 SecondElFromSeq(seq) == [i \in DOMAIN seq |-> seq[i][2]]      
 
+THEOREM LesserTrans ==
+    ASSUME NEW A \in Nat, NEW B \in Nat, NEW C \in Nat
+    PROVE A <= B /\ B < C => A < C
+        <1>q QED               
+          <2> SUFFICES ASSUME A <= B /\ B < C
+                       PROVE  A < C
+            OBVIOUS
+          <2>1. A < B \/ A = B OBVIOUS
+          <2>2. CASE A < B BY DEF <
+          <2>3. CASE A = B BY <2>3
+          <2> QED BY <2>1, <2>2, <2>3
+
 THEOREM OrderPartition ==
   ASSUME NEW S, NEW seq1 \in Seq(S), NEW seq2 \in Seq(S)
   PROVE  Ordered(seq1 \o seq2) => Ordered(seq1)
     <1>1. CASE Ordered1(seq1 \o seq2) BY <1>1 DEF Ordered, Ordered1
     <1>2. CASE Ordered2(seq1 \o seq2) BY <1>2 DEF Ordered, Ordered2
     <1>3. QED BY <1>1, <1>2 DEF Ordered
+    
+THEOREM OrderPartition1Middle ==
+  ASSUME NEW x \in Nat, NEW y \in Nat, NEW seq1 \in Seq(Nat), \E i \in 1..Len(seq1): seq1[i] < y
+  PROVE  Ordered1(<<x>> \o seq1 \o <<y>>) => x < y      
+  <1> SUFFICES ASSUME NEW i \in 1..Len(seq1),
+                      seq1[i] < y,
+                      Ordered1(<<x>> \o seq1 \o <<y>>)
+               PROVE  x < y
+    OBVIOUS
+  <1>1. (<<x>> \o seq1 \o <<y>>)[1] = x BY ConcatProperties
+  <1>2. (<<x>> \o seq1 \o <<y>>)[i + 1] = seq1[i] BY ConcatProperties  
+  <1>3. i + 1 > 1 OBVIOUS
+  <1>4. x <= seq1[i] BY <1>1, <1>2, <1>3 DEF Ordered1
+  <1>6. x < y
+    <2>1. seq1[i] \in Nat BY ElementOfSeq 
+    <2>q QED BY LesserTrans, <1>4, <2>1
+  <1>q QED BY <1>6
+  
+THEOREM OrderPartition2Middle ==
+  ASSUME NEW x \in Nat, NEW y \in Nat, NEW seq1 \in Seq(Nat), \E i \in 1..Len(seq1): seq1[i] > y
+  PROVE  Ordered2(<<x>> \o seq1 \o <<y>>) => x > y      
+  <1> SUFFICES ASSUME NEW i \in 1..Len(seq1),
+                      seq1[i] > y,
+                      Ordered2(<<x>> \o seq1 \o <<y>>)
+               PROVE  x > y
+    OBVIOUS
+  <1>1. (<<x>> \o seq1 \o <<y>>)[1] = x BY ConcatProperties
+  <1>2. (<<x>> \o seq1 \o <<y>>)[i + 1] = seq1[i] BY ConcatProperties  
+  <1>3. i + 1 > 1 OBVIOUS
+  <1>4. x >= seq1[i] BY <1>1, <1>2, <1>3 DEF Ordered2
+  <1>6. x > y
+    <2>1. seq1[i] \in Nat BY ElementOfSeq 
+    <2>q QED BY LesserTrans, <1>4, <2>1
+  <1>q QED BY <1>6  
+  
+THEOREM OrderPartition1MiddleR ==
+  ASSUME NEW x \in Nat, NEW y \in Nat, NEW seq1 \in Seq(Nat), \E i \in 1..Len(seq1): seq1[i] > x
+  PROVE  Ordered1(<<x>> \o seq1 \o <<y>>) => x < y      
+  <1> SUFFICES ASSUME NEW i \in 1..Len(seq1),
+                      seq1[i] > x,
+                      Ordered1(<<x>> \o seq1 \o <<y>>)
+               PROVE  x < y
+    OBVIOUS
+  <1>1. (<<x>> \o seq1 \o <<y>>)[Len(<<x>> \o seq1 \o <<y>>)] = y BY ConcatProperties
+  <1>2. (<<x>> \o seq1 \o <<y>>)[i + 1] = seq1[i] BY ConcatProperties  
+  <1>3. i + 1 < Len(<<x>> \o seq1 \o <<y>>) OBVIOUS
+  <1>4. y >= seq1[i] BY <1>1, <1>2, <1>3 DEF Ordered1
+  <1>6. x < y
+    <2>1. seq1[i] \in Nat BY ElementOfSeq 
+    <2>q QED BY LesserTrans, <1>4, <2>1
+  <1>q QED BY <1>6
+  
+THEOREM OrderPartition2MiddleR ==
+  ASSUME NEW x \in Nat, NEW y \in Nat, NEW seq1 \in Seq(Nat), \E i \in 1..Len(seq1): seq1[i] < x
+  PROVE  Ordered2(<<x>> \o seq1 \o <<y>>) => x > y      
+  <1> SUFFICES ASSUME NEW i \in 1..Len(seq1),
+                      seq1[i] < x,
+                      Ordered2(<<x>> \o seq1 \o <<y>>)
+               PROVE  x > y
+    OBVIOUS
+  <1>1. (<<x>> \o seq1 \o <<y>>)[Len(<<x>> \o seq1 \o <<y>>)] = y BY ConcatProperties
+  <1>2. (<<x>> \o seq1 \o <<y>>)[i + 1] = seq1[i] BY ConcatProperties  
+  <1>3. i + 1 < Len(<<x>> \o seq1 \o <<y>>) OBVIOUS
+  <1>4. y <= seq1[i] BY <1>1, <1>2, <1>3 DEF Ordered2
+  <1>6. x > y
+    <2>1. seq1[i] \in Nat BY ElementOfSeq 
+    <2>q QED BY LesserTrans, <1>4, <2>1
+  <1>q QED BY <1>6      
+   
     
 THEOREM OrderPartition1 ==
   ASSUME NEW S, NEW seq1 \in Seq(S), NEW seq2 \in Seq(S)
@@ -218,6 +299,20 @@ THEOREM OrderPartitionConcatElem1L ==
    <1>12. (<<x>> \o seq1 \o <<y>>)[1] = x BY <1>1, ConcatProperties
    <1>18. x <= y BY <1>11, <1>12, <1>3 DEF Ordered1
    <1>q QED BY <1>18
+   
+THEOREM OrderPartitionConcatElem2LR2 ==
+  ASSUME NEW S, NEW x \in S, NEW y \in S, NEW seq1 \in Seq(S)
+  PROVE  Ordered2(<<x>> \o seq1 \o <<y>>) => x >= y
+   <1> SUFFICES ASSUME Ordered2(<<x>> \o seq1 \o <<y>>)
+                PROVE  x >= y
+     OBVIOUS
+   <1>1. <<x>> \in Seq(S) BY SingletonSeqInSeq
+   <1>2. <<y>> \in Seq(S) BY SingletonSeqInSeq      
+   <1>3. 1 <  Len(<<x>> \o seq1 \o <<y>>) OBVIOUS  
+   <1>11. (<<x>> \o seq1 \o <<y>>)[Len(<<x>> \o seq1 \o <<y>>)] = y BY <1>1, ConcatProperties  
+   <1>12. (<<x>> \o seq1 \o <<y>>)[1] = x BY <1>1, ConcatProperties
+   <1>18. x >= y BY <1>11, <1>12, <1>3 DEF Ordered2
+   <1>q QED BY <1>18   
   
 THEOREM OrderPartitionConcatElem2L ==
   ASSUME NEW S, NEW x \in S, NEW seq1 \in Seq(S),  seq1 # <<>>
@@ -256,15 +351,4 @@ THEOREM HeadTailPart ==
     PROVE <<Head(seq)>> \o Tail(seq) = seq      
         <1>q QED BY DEF Head, Tail, Seq, \o 
         
-THEOREM LesserTrans ==
-    ASSUME NEW A \in Nat, NEW B \in Nat, NEW C \in Nat
-    PROVE A <= B /\ B < C => A < C
-        <1>q QED               
-          <2> SUFFICES ASSUME A <= B /\ B < C
-                       PROVE  A < C
-            OBVIOUS
-          <2>1. A < B \/ A = B OBVIOUS
-          <2>2. CASE A < B BY DEF <
-          <2>3. CASE A = B BY <2>3
-          <2> QED BY <2>1, <2>2, <2>3
 =============================================================================

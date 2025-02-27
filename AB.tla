@@ -218,77 +218,286 @@ THEOREM Refinement2 == Spec => ABS!Spec
                                 <10>2. SecondElFromSeq(AtoB) \in Seq({0,1}) BY DEF TypeInv, IndInv, SecondElFromSeq
                                 <10>3. <<AVar[2]>> \in Seq({0,1}) BY DEF TypeInv, IndInv
                                 <10>q QED BY <10>1, <10>2, <10>3
-                            <9>q QED BY <8>2, <9>1, <9>2, OrderPartitionr DEF IndInv, TypeInv, Reverse                                          
+                            <9>q QED BY <8>2, <9>1, <9>2, OrderPartitionr DEF IndInv, TypeInv, Reverse        
+                        <8>44. Ordered(<<BVar[2]>> \o SecondElFromSeq(AtoB))
+                            <9>1. <<BVar[2]>> \o SecondElFromSeq(AtoB) \in Seq({0,1}) BY DEF TypeInv, IndInv, SecondElFromSeq
+                            <9>q QED BY <8>2, <9>1, OrderPartition DEF IndInv, TypeInv, Reverse                                                                
                         <8>3a. BVar[2] \in {0, 1} BY DEF IndInv, TypeInv
                         <8>3b. Head(AtoB)[2] \in {0, 1}   BY <4>4, ElementOfSeq DEF IndInv, TypeInv, BRcv                                            
                         <8>3. Head(AtoB)[2] > BVar[2] \/ Head(AtoB)[2] < BVar[2] BY <5>2, <4>4, ElementOfSeq DEF IndInv, TypeInv, BRcv   
-                        <8>6. CASE Head(AtoB)[2] > BVar[2]
+                        <8>6. CASE Head(AtoB)[2] # BVar[2]
                             <9>1. AVar[2] \in {0,1} BY DEF IndInv, TypeInv
                             <9>2. Head(AtoB)[2] \in {0,1} BY <8>3b
                             <9>3. BVar[2] \in {0,1} BY DEF TypeInv, IndInv   
-                            <9>4. BVar[2] = 0 BY <9>2, <9>3, <8>6 
-                            <9>5. Head(AtoB)[2] = 1 BY <9>2, <9>3, <8>6  
+                            <9>4. BVar[2] = 1 - Head(AtoB)[2] BY <9>2, <9>3, <8>6 
                             <9>5aa. AtoB \in Seq(Data \X {0,1}) BY DEF TypeInv, IndInv    
                             <9>5bb. AtoB # << >>  BY <4>4 DEF BRcv                               
-                            <9>8 Head(AtoB)[2] = Head(SecondElFromSeq(AtoB)) BY <9>5aa, <9>5bb, SeqComm                             
-                            <9>5b. SecondElFromSeq(AtoB) \in Seq({0,1}) BY DEF TypeInv, IndInv, SecondElFromSeq                            
-                            <9>6. Ordered1(<<BVar[2]>> \o SecondElFromSeq(AtoB) \o <<AVar[2]>>)    
-                                <10>2. ASSUME Ordered2(<<BVar[2]>> \o SecondElFromSeq(AtoB) \o <<AVar[2]>>) PROVE FALSE
-                                    <11>a SecondElFromSeq(AtoB) \in Seq({0,1}) BY DEF TypeInv, IndInv, SecondElFromSeq      
-                                    <11>b <<BVar[2]>> \in Seq({0,1}) BY DEF TypeInv, IndInv, SecondElFromSeq     
-                                    <11>c Ordered2(<<BVar[2]>> \o SecondElFromSeq(AtoB)) BY <10>2, <9>1, <9>3, <9>5b, OrderPartition2   
-                                    <11>d 1 \in 1..Len(SecondElFromSeq(AtoB))     
-                                        <12>0. SecondElFromSeq(AtoB) \in Seq({0,1}) BY DEF IndInv, TypeInv, SecondElFromSeq   
-                                        <12>1. SecondElFromSeq(AtoB) # << >>
-                                            <13>1. AtoB # << >> BY <4>4 DEF BRcv
-                                            <13>2. AtoB \in Seq(Data \X {0,1}) BY DEF TypeInv, IndInv
-                                            <13>q QED BY <13>1, <13>2 DEF SecondElFromSeq
-                                        <12>3. Len(SecondElFromSeq(AtoB)) >= 1 BY EmptySeq, <12>1, <12>0
-                                        <12>q QED BY <12>3                          
-                                    <11>1. BVar[2] >= SecondElFromSeq(AtoB)[1] BY <11>a, <11>b, <11>c, <11>d, OrderPartitionConcatElem2L
-                                    <11>2. BVar[2] >= Head(AtoB)[2] BY <11>1, <9>8 DEF SecondElFromSeq, Head                                 
-                                    <11>q QED BY <11>2, <9>5, <9>4                                 
-                                <10>q QED BY <8>2, <10>2 DEF Ordered   
-                            <9>7. AVar[2] = 1
-                                <10>1. BVar[2] \in {0,1} BY DEF IndInv, TypeInv
-                                <10>3. SecondElFromSeq(AtoB) \in Seq({0,1}) BY DEF IndInv, TypeInv, SecondElFromSeq   
-                                <10>4. BVar[2] < AVar[2] 
-                                    <11>1. BVar[2] <= AVar[2] BY <9>6, <9>1, <10>1, <10>3, OrderPartitionConcatElem1LR2
-                                    <11>2. <<BVar[2]>> \in Seq({0,1}) BY <9>3
-                                    <11>3. <<AVar[2]>> \in Seq({0,1}) BY <9>1                                   
-                                    <11>4. <<BVar[2]>> \o SecondElFromSeq(AtoB) \o <<AVar[2]>> = <<BVar[2]>> \o (SecondElFromSeq(AtoB) \o <<AVar[2]>>) BY ConcatAssociative, <11>3, <11>2, <9>5b, <11>2
-                                    <11>5. (SecondElFromSeq(AtoB) \o <<AVar[2]>>) \in Seq({0,1}) BY <9>5b, <11>3                                    
-                                    <11>6. Ordered1(SecondElFromSeq(AtoB) \o <<AVar[2]>>) BY <9>6, <11>2,<11>3,<11>4, <11>5, OrderPartition1r
-                                    <11>7. Ordered1(<<BVar[2]>> \o SecondElFromSeq(AtoB)) BY <9>6, <11>2,<11>3, <9>5b, OrderPartition1
-                                    <11>8a SecondElFromSeq(AtoB) # << >>  BY <4>4 DEF BRcv, SecondElFromSeq, TypeInv, IndInv     
-                                    <11>8b AtoB # << >>  BY <4>4 DEF BRcv, SecondElFromSeq
-                                    <11>8. Head(SecondElFromSeq(AtoB)) <= AVar[2] 
-                                        <12>1 SecondElFromSeq(AtoB) = <<Head(SecondElFromSeq(AtoB))>> \o Tail(SecondElFromSeq(AtoB)) BY HeadTailPart, <9>5b, <11>8a
-                                        <12>2 Ordered1(<<Head(SecondElFromSeq(AtoB))>> \o Tail(SecondElFromSeq(AtoB)) \o <<AVar[2]>>) BY <12>1, <11>6 
-                                        <12>3 Tail(SecondElFromSeq(AtoB)) \in Seq({0,1}) BY  <9>5b, <11>8a, HeadTailProperties
-                                        <12>4 <<Head(SecondElFromSeq(AtoB))>> \in Seq({0,1}) BY  <9>5b, <11>8a, HeadTailProperties
-                                        <12>q QED BY <12>1, <12>2, <12>3, <12>4, <11>3, <9>5b, OrderPartitionConcatElem1LR2, HeadTailProperties 
-                                    <11>9. BVar[2] < Head(SecondElFromSeq(AtoB)) BY <8>6 , <9>8
-                                    <11>10a SecondElFromSeq(AtoB) \in Seq({0,1}) BY DEF TypeInv, IndInv, SecondElFromSeq  
-                                    <11>10b SecondElFromSeq(AtoB) # << >>     
-                                        <12>1. AtoB # << >> BY <4>4 DEF BRcv
-                                        <12>2. AtoB \in Seq(Data \X {0,1}) BY DEF TypeInv, IndInv
-                                        <12>q QED BY <12>1, <12>2 DEF SecondElFromSeq
-                                    <11>10. Head(SecondElFromSeq(AtoB)) \in {0,1} BY <11>10a, <11>10b, HeadTailProperties DEF Head, Seq
-                                    <11>11. BVar[2] \in Nat BY DEF IndInv, TypeInv
-                                    <11>12. AVar[2] \in Nat BY DEF IndInv, TypeInv                               
-                                    <11>q QED BY <11>8, <11>9, <11>10, <11>11, <11>12, LesserTrans 
-                                <10>q QED  BY <10>4, <9>4, <9>1, <9>3                                   
-                            <9>q QED BY <9>5, <9>7
-                        <8>5. CASE Head(AtoB)[2] < BVar[2] 
-                        <8>q QED BY <8>2, <8>4, <8>3, <8>6, <8>5 
+                            <9>8. Head(AtoB)[2] = Head(SecondElFromSeq(AtoB)) BY <9>5aa, <9>5bb, SeqComm                             
+                            <9>5b. SecondElFromSeq(AtoB) \in Seq({0,1}) BY DEF TypeInv, IndInv, SecondElFromSeq  
+                            <9>6b. \/ Ordered1(<<BVar[2]>> \o SecondElFromSeq(AtoB) \o <<AVar[2]>>)  
+                                   \/ Ordered2(<<BVar[2]>> \o SecondElFromSeq(AtoB) \o <<AVar[2]>>) BY <8>2 DEF  Ordered       
+                            <9>6c. \/ Ordered1(SecondElFromSeq(AtoB) \o <<AVar[2]>>)  
+                                   \/ Ordered2(SecondElFromSeq(AtoB) \o <<AVar[2]>>) BY <8>4 DEF  Ordered   
+                            <9>6cc. \/ Ordered1(<<BVar[2]>> \o SecondElFromSeq(AtoB))  
+                                    \/ Ordered2(<<BVar[2]>> \o SecondElFromSeq(AtoB)) BY <8>44 DEF  Ordered                                                                         
+                            <9>6dd. BVar[2] <= AVar[2] \/ BVar[2] >= AVar[2] 
+                                <10>1. <<BVar[2]>> \in Seq({0,1}) BY DEF IndInv, TypeInv 
+                                <10>2. <<AVar[2]>> \in Seq({0,1}) BY DEF IndInv, TypeInv
+                                <10>q QED BY <9>6b, <9>5b,<10>1, <10>2 , OrderPartitionConcatElem1LR2, OrderPartitionConcatElem2LR2    
+                            <9>6d. BVar[2] # AVar[2]
+                                <10>1. CASE Head(AtoB)[2] > BVar[2] 
+                                    <11>1. Head(AtoB)[2] <= AVar[2]
+                                        <12>1. SecondElFromSeq(AtoB) # << >>  BY <4>4 DEF BRcv, SecondElFromSeq, TypeInv, IndInv
+                                        <12>2. SecondElFromSeq(AtoB) = <<Head(SecondElFromSeq(AtoB))>> \o Tail(SecondElFromSeq(AtoB)) BY HeadTailPart, <9>5b, <12>1
+                                        <12>3. Ordered1(SecondElFromSeq(AtoB) \o <<AVar[2]>>)
+                                            <13>1. Ordered1(<<BVar[2]>> \o (SecondElFromSeq(AtoB) \o <<AVar[2]>>)) 
+                                                <14>1. Ordered1(<<BVar[2]>> \o SecondElFromSeq(AtoB) \o <<AVar[2]>>)
+                                                    <15>1. \/ Ordered1(<<BVar[2]>> \o SecondElFromSeq(AtoB)  \o <<AVar[2]>>)  
+                                                           \/ Ordered2(<<BVar[2]>> \o SecondElFromSeq(AtoB)  \o <<AVar[2]>>) BY <8>2 DEF  Ordered  
+                                                    <15>2. ASSUME Ordered2(<<BVar[2]>> \o SecondElFromSeq(AtoB)  \o <<AVar[2]>>) PROVE FALSE
+                                                        <16>1. Ordered2(<<BVar[2]>> \o SecondElFromSeq(AtoB))
+                                                            <17>1. <<BVar[2]>> \o SecondElFromSeq(AtoB) \in Seq({0,1}) BY DEF IndInv, TypeInv, SecondElFromSeq 
+                                                            <17>2. <<AVar[2]>> \in Seq({0,1}) BY DEF IndInv, TypeInv 
+                                                            <17>q QED BY OrderPartition2, <17>1, <17>2, <15>2
+                                                        <16>2. Ordered2(<<BVar[2]>> \o (<<Head(SecondElFromSeq(AtoB))>> \o Tail(SecondElFromSeq(AtoB)))) BY <12>2, <16>1
+                                                        <16>3. Ordered2(<<BVar[2]>> \o <<Head(SecondElFromSeq(AtoB))>> \o Tail(SecondElFromSeq(AtoB)))
+                                                            <17>1. <<BVar[2]>> \o (<<Head(SecondElFromSeq(AtoB))>> \o Tail(SecondElFromSeq(AtoB))) =  <<BVar[2]>> \o <<Head(SecondElFromSeq(AtoB))>> \o Tail(SecondElFromSeq(AtoB)) 
+                                                                <18>1. <<BVar[2]>> \in Seq({0, 1}) BY DEF IndInv, TypeInv, SecondElFromSeq 
+                                                                <18>2. SecondElFromSeq(AtoB) # << >>  BY <4>4 DEF BRcv, SecondElFromSeq, TypeInv, IndInv 
+                                                                <18>3. <<Head(SecondElFromSeq(AtoB))>> \in Seq({0, 1}) BY <18>2 DEF IndInv, TypeInv, SecondElFromSeq 
+                                                                <18>4. Tail(SecondElFromSeq(AtoB)) \in Seq({0, 1}) BY <18>2, <9>5b, HeadTailProperties 
+                                                                <18>q QED BY ConcatAssociative, <18>1, <18>3, <18>4      
+                                                            <17>q QED BY <17>1, <16>2                                                     
+                                                        <16>4. Ordered2(<<BVar[2]>> \o <<Head(SecondElFromSeq(AtoB))>>)
+                                                            <17>2. SecondElFromSeq(AtoB) # << >>  BY <4>4 DEF BRcv, SecondElFromSeq, TypeInv, IndInv 
+                                                            <17>3. <<Head(SecondElFromSeq(AtoB))>> \in Seq({0, 1}) BY <17>2 DEF IndInv, TypeInv, SecondElFromSeq 
+                                                            <17>4. Tail(SecondElFromSeq(AtoB)) \in Seq({0, 1}) BY <17>2, <9>5b, HeadTailProperties
+                                                            <17>5. <<BVar[2]>> \o <<Head(SecondElFromSeq(AtoB))>> \in Seq({0, 1})  BY <17>3 DEF IndInv, TypeInv, SecondElFromSeq                                                                
+                                                            <17>q QED BY OrderPartition2, <16>3, <17>5, <17>4
+                                                        <16>5. Ordered2(<<BVar[2]>> \o << >> \o <<Head(SecondElFromSeq(AtoB))>>)
+                                                            <17>1. <<BVar[2]>> \o << >> = <<BVar[2]>> BY ConcatEmptySeq, <9>3
+                                                            <17>q QED BY <16>4, <17>1
+                                                        <16>6. Head(SecondElFromSeq(AtoB)) <= BVar[2]
+                                                            <17>1. SecondElFromSeq(AtoB) # << >>  BY <4>4 DEF BRcv, SecondElFromSeq, TypeInv, IndInv                                                         
+                                                            <17>2. <<BVar[2]>> \in  Seq({0,1}) BY DEF IndInv, TypeInv
+                                                            <17>3. <<Head(SecondElFromSeq(AtoB))>> \in  Seq({0,1}) BY <17>1 DEF IndInv, TypeInv, SecondElFromSeq 
+                                                            <17>q QED BY <16>5, OrderPartitionConcatElem2LR2, <17>2, <17>3
+                                                        <16>7. Head(AtoB)[2] <= BVar[2] BY <16>6, <9>8
+                                                        <16>q QED BY <16>7, <10>1, <9>1, <9>2, <9>3
+                                                    <15>q QED BY <15>1, <15>2
+                                                <14>2. <<BVar[2]>> \in Seq({0,1}) BY DEF IndInv, TypeInv 
+                                                <14>3. <<AVar[2]>> \in Seq({0,1}) BY DEF IndInv, TypeInv   
+                                                <14>4. SecondElFromSeq(AtoB) \in Seq({0,1}) BY DEF TypeInv, IndInv, SecondElFromSeq                                               
+                                                <14>q QED BY <14>1,<14>2,<14>3,<14>4, ConcatAssociative
+                                            <13>2. <<BVar[2]>> \in Seq({0,1}) BY DEF IndInv, TypeInv
+                                            <13>4. (SecondElFromSeq(AtoB) \o <<AVar[2]>>) \in Seq({0,1}) BY DEF TypeInv, IndInv, SecondElFromSeq  
+                                            <13>q QED BY <13>1, <13>2, <13>4, OrderPartition1r
+                                        <12>4. Ordered1(<<Head(SecondElFromSeq(AtoB))>> \o Tail(SecondElFromSeq(AtoB)) \o <<AVar[2]>>) BY <12>2, <12>3
+                                        <12>5. SecondElFromSeq(AtoB) # << >>  BY <4>4 DEF BRcv, SecondElFromSeq, TypeInv, IndInv 
+                                        <12>6. Tail(SecondElFromSeq(AtoB)) \in Seq({0,1}) BY  <9>5b, <12>5, HeadTailProperties
+                                        <12>8. AVar[2] \in {0,1} BY <9>1
+                                        <12>9. Head(SecondElFromSeq(AtoB)) \in {0,1} BY  <9>5b, <12>5, HeadTailProperties  
+                                        <12>10. Head(AtoB)[2] = Head(SecondElFromSeq(AtoB)) BY <9>8                                        
+                                        <12>q QED BY <12>4, <12>6, <12>8, <12>9, <12>10, OrderPartitionConcatElem1LR2                                    
+                                    <11>2. BVar[2] < AVar[2] BY <11>1, LesserTrans, <10>1, <9>1, <8>3a, <8>3b  
+                                    <11>q QED BY <11>2
+                                <10>2. CASE Head(AtoB)[2] < BVar[2]
+                                    <11>1. Head(AtoB)[2] >= AVar[2]
+                                        <12>1. SecondElFromSeq(AtoB) # << >>  BY <4>4 DEF BRcv, SecondElFromSeq, TypeInv, IndInv
+                                        <12>2. SecondElFromSeq(AtoB) = <<Head(SecondElFromSeq(AtoB))>> \o Tail(SecondElFromSeq(AtoB)) BY HeadTailPart, <9>5b, <12>1
+                                        <12>3. Ordered2(SecondElFromSeq(AtoB) \o <<AVar[2]>>)
+                                            <13>1. Ordered2(<<BVar[2]>> \o (SecondElFromSeq(AtoB) \o <<AVar[2]>>)) 
+                                                <14>1. Ordered2(<<BVar[2]>> \o SecondElFromSeq(AtoB) \o <<AVar[2]>>)
+                                                    <15>1. \/ Ordered1(<<BVar[2]>> \o SecondElFromSeq(AtoB)  \o <<AVar[2]>>)  
+                                                           \/ Ordered2(<<BVar[2]>> \o SecondElFromSeq(AtoB)  \o <<AVar[2]>>) BY <8>2 DEF  Ordered  
+                                                    <15>2. ASSUME Ordered1(<<BVar[2]>> \o SecondElFromSeq(AtoB)  \o <<AVar[2]>>) PROVE FALSE
+                                                        <16>1. Ordered1(<<BVar[2]>> \o SecondElFromSeq(AtoB))
+                                                            <17>1. <<BVar[2]>> \o SecondElFromSeq(AtoB) \in Seq({0,1}) BY DEF IndInv, TypeInv, SecondElFromSeq 
+                                                            <17>2. <<AVar[2]>> \in Seq({0,1}) BY DEF IndInv, TypeInv 
+                                                            <17>q QED BY OrderPartition1, <17>1, <17>2, <15>2
+                                                        <16>2. Ordered1(<<BVar[2]>> \o (<<Head(SecondElFromSeq(AtoB))>> \o Tail(SecondElFromSeq(AtoB)))) BY <12>2, <16>1
+                                                        <16>3. Ordered1(<<BVar[2]>> \o <<Head(SecondElFromSeq(AtoB))>> \o Tail(SecondElFromSeq(AtoB)))
+                                                            <17>1. <<BVar[2]>> \o (<<Head(SecondElFromSeq(AtoB))>> \o Tail(SecondElFromSeq(AtoB))) =  <<BVar[2]>> \o <<Head(SecondElFromSeq(AtoB))>> \o Tail(SecondElFromSeq(AtoB)) 
+                                                                <18>1. <<BVar[2]>> \in Seq({0, 1}) BY DEF IndInv, TypeInv, SecondElFromSeq 
+                                                                <18>2. SecondElFromSeq(AtoB) # << >>  BY <4>4 DEF BRcv, SecondElFromSeq, TypeInv, IndInv 
+                                                                <18>3. <<Head(SecondElFromSeq(AtoB))>> \in Seq({0, 1}) BY <18>2 DEF IndInv, TypeInv, SecondElFromSeq 
+                                                                <18>4. Tail(SecondElFromSeq(AtoB)) \in Seq({0, 1}) BY <18>2, <9>5b, HeadTailProperties 
+                                                                <18>q QED BY ConcatAssociative, <18>1, <18>3, <18>4      
+                                                            <17>q QED BY <17>1, <16>2                                                     
+                                                        <16>4. Ordered1(<<BVar[2]>> \o <<Head(SecondElFromSeq(AtoB))>>)
+                                                            <17>2. SecondElFromSeq(AtoB) # << >>  BY <4>4 DEF BRcv, SecondElFromSeq, TypeInv, IndInv 
+                                                            <17>3. <<Head(SecondElFromSeq(AtoB))>> \in Seq({0, 1}) BY <17>2 DEF IndInv, TypeInv, SecondElFromSeq 
+                                                            <17>4. Tail(SecondElFromSeq(AtoB)) \in Seq({0, 1}) BY <17>2, <9>5b, HeadTailProperties
+                                                            <17>5. <<BVar[2]>> \o <<Head(SecondElFromSeq(AtoB))>> \in Seq({0, 1})  BY <17>3 DEF IndInv, TypeInv, SecondElFromSeq                                                                
+                                                            <17>q QED BY OrderPartition1, <16>3, <17>5, <17>4
+                                                        <16>5. Ordered1(<<BVar[2]>> \o << >> \o <<Head(SecondElFromSeq(AtoB))>>)
+                                                            <17>1. <<BVar[2]>> \o << >> = <<BVar[2]>> BY ConcatEmptySeq, <9>3
+                                                            <17>q QED BY <16>4, <17>1
+                                                        <16>6. Head(SecondElFromSeq(AtoB)) >= BVar[2]
+                                                            <17>1. SecondElFromSeq(AtoB) # << >>  BY <4>4 DEF BRcv, SecondElFromSeq, TypeInv, IndInv                                                         
+                                                            <17>2. <<BVar[2]>> \in  Seq({0,1}) BY DEF IndInv, TypeInv
+                                                            <17>3. <<Head(SecondElFromSeq(AtoB))>> \in  Seq({0,1}) BY <17>1 DEF IndInv, TypeInv, SecondElFromSeq 
+                                                            <17>q QED BY <16>5, OrderPartitionConcatElem1LR2, <17>2, <17>3
+                                                        <16>7. Head(AtoB)[2] >= BVar[2] BY <16>6, <9>8
+                                                        <16>q QED BY <16>7, <10>2, <9>1, <9>2, <9>3
+                                                    <15>q QED BY <15>1, <15>2
+                                                <14>2. <<BVar[2]>> \in Seq({0,1}) BY DEF IndInv, TypeInv 
+                                                <14>3. <<AVar[2]>> \in Seq({0,1}) BY DEF IndInv, TypeInv   
+                                                <14>4. SecondElFromSeq(AtoB) \in Seq({0,1}) BY DEF TypeInv, IndInv, SecondElFromSeq                                               
+                                                <14>q QED BY <14>1,<14>2,<14>3,<14>4, ConcatAssociative
+                                            <13>2. <<BVar[2]>> \in Seq({0,1}) BY DEF IndInv, TypeInv
+                                            <13>4. (SecondElFromSeq(AtoB) \o <<AVar[2]>>) \in Seq({0,1}) BY DEF TypeInv, IndInv, SecondElFromSeq  
+                                            <13>q QED BY <13>1, <13>2, <13>4, OrderPartition2r
+                                        <12>4. Ordered2(<<Head(SecondElFromSeq(AtoB))>> \o Tail(SecondElFromSeq(AtoB)) \o <<AVar[2]>>) BY <12>2, <12>3
+                                        <12>5. SecondElFromSeq(AtoB) # << >>  BY <4>4 DEF BRcv, SecondElFromSeq, TypeInv, IndInv 
+                                        <12>6. Tail(SecondElFromSeq(AtoB)) \in Seq({0,1}) BY  <9>5b, <12>5, HeadTailProperties
+                                        <12>8. AVar[2] \in {0,1} BY <9>1
+                                        <12>9. Head(SecondElFromSeq(AtoB)) \in {0,1} BY  <9>5b, <12>5, HeadTailProperties  
+                                        <12>10. Head(AtoB)[2] = Head(SecondElFromSeq(AtoB)) BY <9>8                                        
+                                        <12>q QED BY <12>4, <12>6, <12>8, <12>9, <12>10, OrderPartitionConcatElem2LR2                                          
+                                    <11>2. BVar[2] > AVar[2] BY <11>1, LesserTrans, <10>2, <9>1, <8>3a, <8>3b  
+                                    <11>q QED BY <11>2                                
+                                <10>q QED BY <10>1, <10>2, <9>1, <9>2, <8>6 
+                            <9>6dddd. Head(AtoB)[2] = AVar[2] BY <8>6, <9>6d, <9>1, <9>2, <9>3                                 
+                            <9>q QED BY <9>6dddd
+                        <8>q QED BY <8>2, <8>4, <8>3, <8>6
                     <7>6. Head(AtoB) = AVar
                         <8>1. AtoB # << >> BY <4>4 DEF BRcv
                         <8>2. AtoB \in Seq(Data \X {0,1}) BY DEF IndInv, TypeInv   
                         <8>3. Len(AtoB) >= 1 BY EmptySeq, <8>1, <8>2
                         <8>q QED BY <7>2, <8>3 DEF IndInv, InvSend, Head                    
                     <7>q QED BY <7>1, <7>6
-                <6>4. AVar[2] # BVar[2]              
+                <6>4. AVar[2] # BVar[2] 
+                    <7>1. Ordered(BtoA \o <<BVar[2]>> \o SecondElFromSeq(AtoB) \o <<AVar[2]>>)  BY DEF IndInv, Toggle
+                    <7>2. \/ Ordered1(BtoA \o <<BVar[2]>> \o SecondElFromSeq(AtoB) \o <<AVar[2]>>)
+                          \/ Ordered2(BtoA \o <<BVar[2]>> \o SecondElFromSeq(AtoB) \o <<AVar[2]>>) BY <7>1 DEF Ordered
+                    <7>3. CASE Ordered1(BtoA \o <<BVar[2]>> \o SecondElFromSeq(AtoB) \o <<AVar[2]>>)
+                        <8>4. Ordered1(<<BVar[2]>> \o SecondElFromSeq(AtoB) \o <<AVar[2]>>)
+                            <9>1. BtoA \o (<<BVar[2]>> \o SecondElFromSeq(AtoB) \o <<AVar[2]>>) = BtoA \o <<BVar[2]>> \o SecondElFromSeq(AtoB) \o <<AVar[2]>>
+                                <10>1. BtoA \o (<<BVar[2]>> \o (SecondElFromSeq(AtoB) \o <<AVar[2]>>)) = BtoA \o <<BVar[2]>> \o (SecondElFromSeq(AtoB) \o <<AVar[2]>>)
+                                    <11>1. BtoA \in Seq({0, 1}) BY DEF TypeInv, IndInv
+                                    <11>2. <<BVar[2]>> \in Seq({0, 1}) BY DEF TypeInv, IndInv
+                                    <11>3. SecondElFromSeq(AtoB) \o <<AVar[2]>> \in Seq({0, 1}) BY DEF TypeInv, IndInv, SecondElFromSeq  
+                                    <11>q QED BY <11>1, <11>2, <11>3, ConcatAssociative
+                                <10>2. <<BVar[2]>> \o (SecondElFromSeq(AtoB) \o <<AVar[2]>>) = <<BVar[2]>> \o SecondElFromSeq(AtoB) \o <<AVar[2]>>
+                                    <11>1. <<AVar[2]>> \in Seq({0, 1}) BY DEF TypeInv, IndInv
+                                    <11>2. <<BVar[2]>> \in Seq({0, 1}) BY DEF TypeInv, IndInv
+                                    <11>3. SecondElFromSeq(AtoB) \in Seq({0, 1})  BY DEF TypeInv, IndInv, SecondElFromSeq  
+                                    <11>q QED BY <11>1, <11>2, <11>3, ConcatAssociative
+                                <10>3. BtoA \o <<BVar[2]>> \o (SecondElFromSeq(AtoB) \o <<AVar[2]>>) = BtoA \o <<BVar[2]>> \o SecondElFromSeq(AtoB) \o <<AVar[2]>>
+                                    <11>1. BtoA \o <<BVar[2]>>  \in Seq({0, 1}) BY DEF TypeInv, IndInv
+                                    <11>2. <<AVar[2]>> \in Seq({0, 1}) BY DEF TypeInv, IndInv
+                                    <11>3. SecondElFromSeq(AtoB) \in Seq({0, 1})  BY DEF TypeInv, IndInv, SecondElFromSeq  
+                                    <11>q QED BY <11>1, <11>2, <11>3, ConcatAssociative
+                                <10>q QED BY ConcatAssociative, <10>1, <10>2,  <10>3
+                            <9>2. Ordered1(<<BVar[2]>> \o SecondElFromSeq(AtoB) \o <<AVar[2]>>)
+                                <10>1. BtoA \in Seq({0, 1}) BY DEF TypeInv, IndInv
+                                <10>2. <<BVar[2]>> \o SecondElFromSeq(AtoB) \o <<AVar[2]>> \in Seq({0, 1}) BY DEF TypeInv, IndInv, SecondElFromSeq  
+                                <10>q QED BY OrderPartition1r, <7>3, <10>1, <10>2, <9>1 
+                            <9>q QED BY <7>3, <9>1, <9>2                    
+                        <8>2. Head(AtoB)[2] = Head(SecondElFromSeq(AtoB))
+                            <9>1. AtoB \in Seq(Data \X {0,1}) BY DEF TypeInv, IndInv    
+                            <9>2. AtoB # << >>  BY <4>4 DEF BRcv
+                            <9>q QED BY SeqComm, <9>1, <9>2  
+                        <8>1. Head(AtoB)[2] > BVar[2]
+                            <9>1. Ordered1(<<BVar[2]>> \o SecondElFromSeq(AtoB))
+                                <10>1. <<BVar[2]>> \o SecondElFromSeq(AtoB) \in Seq({0, 1}) BY DEF TypeInv, IndInv, SecondElFromSeq  
+                                <10>2. <<AVar[2]>> \in Seq({0, 1}) BY DEF TypeInv, IndInv  
+                                <10>q QED BY <10>1, <10>2, OrderPartition1, <8>4
+                            <9>2. \A i \in 1..Len(SecondElFromSeq(AtoB)) : SecondElFromSeq(AtoB)[i] >= BVar[2]
+                                <10>1. BVar[2] \in {0, 1} BY DEF TypeInv, IndInv  
+                                <10>2. SecondElFromSeq(AtoB) \in Seq({0, 1}) BY DEF TypeInv, IndInv, SecondElFromSeq
+                                <10>q QED BY OrderPartitionConcatElem1L, <9>1, <10>1, <10>2
+                            <9>3. SecondElFromSeq(AtoB)[1] >= BVar[2]
+                                <10>2. SecondElFromSeq(AtoB) # << >>  BY <4>4 DEF BRcv, SecondElFromSeq, TypeInv, IndInv
+                                <10>3. Len(SecondElFromSeq(AtoB)) >= 1
+                                    <11>1. SecondElFromSeq(AtoB) \in Seq({0, 1}) BY DEF TypeInv, IndInv, SecondElFromSeq 
+                                    <11>q QED BY <11>1, <10>2, EmptySeq
+                                <10>4. 1 \in 1..Len(SecondElFromSeq(AtoB)) BY <10>3
+                                <10>q QED BY <10>4, <9>2
+                            <9>4. Head(AtoB)[2] >= BVar[2] BY <9>3, <8>2
+                            <9>q QED BY <9>4, <5>2
+                        <8>3. Head(SecondElFromSeq(AtoB)) > BVar[2] BY <8>1, <8>2
+                        <8>5. BVar[2] < AVar[2] 
+                            <9>1. BVar[2] \in Nat BY DEF TypeInv, IndInv
+                            <9>2. AVar[2] \in Nat BY DEF TypeInv, IndInv
+                            <9>3. SecondElFromSeq(AtoB) \in Seq(Nat) BY DEF TypeInv, IndInv, SecondElFromSeq  
+                            <9>4. \E i \in 1..Len(SecondElFromSeq(AtoB)): SecondElFromSeq(AtoB)[i] > BVar[2]
+                                <10> SUFFICES ASSUME 1 \in 1..Len(SecondElFromSeq(AtoB))
+                                     PROVE SecondElFromSeq(AtoB)[1] > BVar[2]
+                                    <11>1. 1 \in 1..Len(SecondElFromSeq(AtoB)) 
+                                        <12>1. SecondElFromSeq(AtoB) # << >>  BY <4>4 DEF BRcv, SecondElFromSeq, TypeInv, IndInv 
+                                        <12>2. SecondElFromSeq(AtoB) \in Seq({0, 1}) BY DEF TypeInv, IndInv, SecondElFromSeq  
+                                        <12>3. Len(SecondElFromSeq(AtoB)) >= 1 BY <12>1, <12>2
+                                        <12>q QED BY <12>3
+                                    <11>q QED BY <11>1
+                                <10>q QED BY <8>3
+                            <9>q QED BY OrderPartition1MiddleR, <8>4, <9>1, <9>2, <9>3, <9>4
+                        <8>q QED BY <8>5
+                    <7>4. CASE Ordered2(BtoA \o <<BVar[2]>> \o SecondElFromSeq(AtoB) \o <<AVar[2]>>)
+                        <8>4. Ordered2(<<BVar[2]>> \o SecondElFromSeq(AtoB) \o <<AVar[2]>>)
+                            <9>1. BtoA \o (<<BVar[2]>> \o SecondElFromSeq(AtoB) \o <<AVar[2]>>) = BtoA \o <<BVar[2]>> \o SecondElFromSeq(AtoB) \o <<AVar[2]>>
+                                <10>1. BtoA \o (<<BVar[2]>> \o (SecondElFromSeq(AtoB) \o <<AVar[2]>>)) = BtoA \o <<BVar[2]>> \o (SecondElFromSeq(AtoB) \o <<AVar[2]>>)
+                                    <11>1. BtoA \in Seq({0, 1}) BY DEF TypeInv, IndInv
+                                    <11>2. <<BVar[2]>> \in Seq({0, 1}) BY DEF TypeInv, IndInv
+                                    <11>3. SecondElFromSeq(AtoB) \o <<AVar[2]>> \in Seq({0, 1}) BY DEF TypeInv, IndInv, SecondElFromSeq  
+                                    <11>q QED BY <11>1, <11>2, <11>3, ConcatAssociative
+                                <10>2. <<BVar[2]>> \o (SecondElFromSeq(AtoB) \o <<AVar[2]>>) = <<BVar[2]>> \o SecondElFromSeq(AtoB) \o <<AVar[2]>>
+                                    <11>1. <<AVar[2]>> \in Seq({0, 1}) BY DEF TypeInv, IndInv
+                                    <11>2. <<BVar[2]>> \in Seq({0, 1}) BY DEF TypeInv, IndInv
+                                    <11>3. SecondElFromSeq(AtoB) \in Seq({0, 1})  BY DEF TypeInv, IndInv, SecondElFromSeq  
+                                    <11>q QED BY <11>1, <11>2, <11>3, ConcatAssociative
+                                <10>3. BtoA \o <<BVar[2]>> \o (SecondElFromSeq(AtoB) \o <<AVar[2]>>) = BtoA \o <<BVar[2]>> \o SecondElFromSeq(AtoB) \o <<AVar[2]>>
+                                    <11>1. BtoA \o <<BVar[2]>>  \in Seq({0, 1}) BY DEF TypeInv, IndInv
+                                    <11>2. <<AVar[2]>> \in Seq({0, 1}) BY DEF TypeInv, IndInv
+                                    <11>3. SecondElFromSeq(AtoB) \in Seq({0, 1})  BY DEF TypeInv, IndInv, SecondElFromSeq  
+                                    <11>q QED BY <11>1, <11>2, <11>3, ConcatAssociative
+                                <10>q QED BY ConcatAssociative, <10>1, <10>2,  <10>3
+                            <9>2. Ordered2(<<BVar[2]>> \o SecondElFromSeq(AtoB) \o <<AVar[2]>>)
+                                <10>1. BtoA \in Seq({0, 1}) BY DEF TypeInv, IndInv
+                                <10>2. <<BVar[2]>> \o SecondElFromSeq(AtoB) \o <<AVar[2]>> \in Seq({0, 1}) BY DEF TypeInv, IndInv, SecondElFromSeq  
+                                <10>q QED BY OrderPartition2r, <7>4, <10>1, <10>2, <9>1 
+                            <9>q QED BY <7>4, <9>1, <9>2                    
+                        <8>2. Head(AtoB)[2] = Head(SecondElFromSeq(AtoB))
+                            <9>1. AtoB \in Seq(Data \X {0,1}) BY DEF TypeInv, IndInv    
+                            <9>2. AtoB # << >>  BY <4>4 DEF BRcv
+                            <9>q QED BY SeqComm, <9>1, <9>2  
+                        <8>1. Head(AtoB)[2] < BVar[2]
+                            <9>1. Ordered2(<<BVar[2]>> \o SecondElFromSeq(AtoB))
+                                <10>1. <<BVar[2]>> \o SecondElFromSeq(AtoB) \in Seq({0, 1}) BY DEF TypeInv, IndInv, SecondElFromSeq  
+                                <10>2. <<AVar[2]>> \in Seq({0, 1}) BY DEF TypeInv, IndInv  
+                                <10>q QED BY <10>1, <10>2, OrderPartition2, <8>4
+                            <9>2. \A i \in 1..Len(SecondElFromSeq(AtoB)) : SecondElFromSeq(AtoB)[i] <= BVar[2]
+                                <10>1. BVar[2] \in {0, 1} BY DEF TypeInv, IndInv  
+                                <10>2. SecondElFromSeq(AtoB) \in Seq({0, 1}) BY DEF TypeInv, IndInv, SecondElFromSeq
+                                <10>q QED BY OrderPartitionConcatElem2L, <9>1, <10>1, <10>2
+                            <9>3. SecondElFromSeq(AtoB)[1] <= BVar[2]
+                                <10>2. SecondElFromSeq(AtoB) # << >>  BY <4>4 DEF BRcv, SecondElFromSeq, TypeInv, IndInv
+                                <10>3. Len(SecondElFromSeq(AtoB)) >= 1
+                                    <11>1. SecondElFromSeq(AtoB) \in Seq({0, 1}) BY DEF TypeInv, IndInv, SecondElFromSeq 
+                                    <11>q QED BY <11>1, <10>2, EmptySeq
+                                <10>4. 1 \in 1..Len(SecondElFromSeq(AtoB)) BY <10>3
+                                <10>q QED BY <10>4, <9>2
+                            <9>4. Head(AtoB)[2] <= BVar[2] BY <9>3, <8>2
+                            <9>q QED BY <9>4, <5>2
+                        <8>3. Head(SecondElFromSeq(AtoB)) < BVar[2] BY <8>1, <8>2
+                        <8>5. BVar[2] > AVar[2] 
+                            <9>1. BVar[2] \in Nat BY DEF TypeInv, IndInv
+                            <9>2. AVar[2] \in Nat BY DEF TypeInv, IndInv
+                            <9>3. SecondElFromSeq(AtoB) \in Seq(Nat) BY DEF TypeInv, IndInv, SecondElFromSeq  
+                            <9>4. \E i \in 1..Len(SecondElFromSeq(AtoB)): SecondElFromSeq(AtoB)[i] < BVar[2]
+                                <10> SUFFICES ASSUME 1 \in 1..Len(SecondElFromSeq(AtoB))
+                                     PROVE SecondElFromSeq(AtoB)[1] < BVar[2]
+                                    <11>1. 1 \in 1..Len(SecondElFromSeq(AtoB)) 
+                                        <12>1. SecondElFromSeq(AtoB) # << >>  BY <4>4 DEF BRcv, SecondElFromSeq, TypeInv, IndInv 
+                                        <12>2. SecondElFromSeq(AtoB) \in Seq({0, 1}) BY DEF TypeInv, IndInv, SecondElFromSeq  
+                                        <12>3. Len(SecondElFromSeq(AtoB)) >= 1 BY <12>1, <12>2
+                                        <12>q QED BY <12>3
+                                    <11>q QED BY <11>1
+                                <10>q QED BY <8>3
+                            <9>q QED BY OrderPartition2MiddleR, <8>4, <9>1, <9>2, <9>3, <9>4
+                        <8>q QED BY <8>5                    
+                    <7>q QED BY <7>2, <7>3, <7>4            
                 <6>q. QED BY <6>1, <6>3, <5>2, <6>4              
             <5>3. QED BY <5>1, <5>2            
           <4>5. CASE LoseMsg
@@ -311,7 +520,7 @@ FairSpec == Spec  /\  SF_vars(ARcv) /\ SF_vars(BRcv) /\
                       WF_vars(ASnd) /\ WF_vars(BSnd)
 =============================================================================
 \* Modification History
-\* Last modified Sun Feb 23 18:27:17 CET 2025 by appeltwi
+\* Last modified Thu Feb 27 08:31:00 CET 2025 by appeltwi
 \* Last modified Tue Dec 31 18:19:05 CET 2024 by appeltwi
 \* Last modified Wed Dec 27 13:29:51 PST 2017 by lamport
 \* Created Wed Mar 25 11:53:40 PDT 2015 by lamport
