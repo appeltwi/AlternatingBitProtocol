@@ -351,4 +351,59 @@ THEOREM HeadTailPart ==
     PROVE <<Head(seq)>> \o Tail(seq) = seq      
         <1>q QED BY DEF Head, Tail, Seq, \o 
         
+    
+THEOREM OrderBracket ==
+  ASSUME NEW x \in Nat, NEW y \in Nat, NEW seq \in Seq(Nat), x = y
+  PROVE  Ordered(<<x>> \o seq \o <<y>>) => /\ \A i \in 1..Len(seq): seq[i] = x
+                                           /\ \A i \in 1..Len(seq): seq[i] = y    
+  <1> SUFFICES ASSUME Ordered(<<x>> \o seq \o <<y>>)
+               PROVE  /\ \A i \in 1..Len(seq): seq[i] = x
+                      /\ \A i \in 1..Len(seq): seq[i] = y
+    OBVIOUS
+  <1>1. \A i \in 1..Len(seq): seq[i] = x
+    <2>1. CASE Ordered1(<<x>> \o seq \o <<y>>)
+        <3>1. Ordered1(<<x>> \o seq)
+            <4>1. <<x>> \o seq \in Seq(Nat) OBVIOUS
+            <4>2. <<y>> \in Seq(Nat) OBVIOUS
+            <4> QED BY OrderPartition1, <4>1, <4>2, <2>1
+        <3>2. \A i \in 1..Len(seq): seq[i] >= x BY <3>1, OrderPartitionConcatElem1L
+        <3>3. Ordered1(seq \o <<y>>)
+            <4>1. seq \o <<y>> \in Seq(Nat) OBVIOUS
+            <4>2. <<x>> \in Seq(Nat) OBVIOUS
+            <4>3. <<x>> \o seq \o <<y>> = <<x>> \o (seq \o <<y>>) BY ConcatAssociative
+            <4> QED BY OrderPartition1r, <4>1, <4>2, <4>3, <2>1        
+        <3>4. \A i \in 1..Len(seq): seq[i] <= y BY <3>3, OrderPartitionConcatElem1R      
+        <3>5. \A i \in 1..Len(seq): seq[i] = x BY  <3>2, <3>4 
+        <3> QED BY <3>5
+    <2>2. CASE Ordered2(<<x>> \o seq \o <<y>>)
+        <3>1. Ordered2(<<x>> \o seq)
+            <4>1. <<x>> \o seq \in Seq(Nat) OBVIOUS
+            <4>2. <<y>> \in Seq(Nat) OBVIOUS
+            <4> QED BY OrderPartition2, <4>1, <4>2, <2>2
+        <3>2. \A i \in 1..Len(seq): seq[i] <= x BY <3>1, OrderPartitionConcatElem2L
+        <3>3. Ordered2(seq \o <<y>>)
+            <4>1. seq \o <<y>> \in Seq(Nat) OBVIOUS
+            <4>2. <<x>> \in Seq(Nat) OBVIOUS
+            <4>3. <<x>> \o seq \o <<y>> = <<x>> \o (seq \o <<y>>) BY ConcatAssociative
+            <4> QED BY OrderPartition2r, <4>1, <4>2, <4>3, <2>2       
+        <3>4. \A i \in 1..Len(seq): seq[i] >= y BY <3>3, OrderPartitionConcatElem2R      
+        <3>5. \A i \in 1..Len(seq): seq[i] = x BY  <3>2, <3>4 
+        <3> QED BY <3>5    
+    <2>3. QED
+      BY <2>1, <2>2 DEF Ordered
+  <1>2. \A i \in 1..Len(seq): seq[i] = y
+    <2>1. x = y OBVIOUS
+    <2> QED  BY <1>1, <2>1 DEF Ordered
+  <1> QED BY <1>1, <1>2
+                                           
+THEOREM ConcatAssociative5 ==
+  ASSUME NEW S, NEW s \in Seq(S), NEW t \in Seq(S), NEW u \in Seq(S), NEW v \in Seq(S), NEW w \in Seq(S)
+  PROVE  s \o t \o u \o v \o w = s \o (t \o u \o v) \o w
+    <1> QED OBVIOUS     
+    
+THEOREM AppendProperties2 ==
+  ASSUME NEW S, NEW seq \in Seq(S), NEW elt \in S
+  PROVE  \A i \in 1.. Len(Append(seq, elt)) : IF i <= Len(seq) THEN Append(seq, elt)[i] = seq[i] ELSE Append(seq, elt)[Len(seq)+1] = elt
+    <1> QED BY AppendProperties
+        
 =============================================================================
