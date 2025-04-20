@@ -25,8 +25,8 @@ ProdSeq == UNION {[1..n -> Data \X {0,1}] : n \in 0 .. Cardinality(Data \X {0,1}
 nseq == UNION {[1..n -> {0,1}] : n \in 0 .. Cardinality({0,1})}
 TypeInv == /\ AVar \in Data \X {0,1}
            /\ BVar  \in Data \X {0,1}
-          /\ AtoB \in Seq(Data \X {0,1})
-          /\ BtoA \in Seq({0,1})
+           /\ AtoB \in Seq(Data \X {0,1})
+           /\ BtoA \in Seq({0,1})
                 
 Init == /\ AVar \in Data \X {1}
         /\ BVar = AVar
@@ -87,11 +87,13 @@ CheckInv2 ==  \/ AtoB = << >>
 \* does not help us prove Invariant.
 Inv == (AVar[2] = BVar[2]) => (AVar = BVar)
 InvSend == \A i \in 1..Len(AtoB): (AtoB[i][2] = AVar[2] => AtoB[i] = AVar )
+InvSend2 == \A i \in 1..Len(BtoA): (BtoA[i] = AVar[2] => AVar[2] = BVar[2] )
 Toggle == Ordered(BtoA \o <<BVar[2]>> \o SecondElFromSeq(AtoB) \o <<AVar[2]>>)
 IndInv ==  /\ TypeInv
            /\ Inv
            /\ Toggle
            /\ InvSend
+           /\ InvSend2
            
 IndInv1 ==  /\ TypeInv
                /\ CheckInv1
@@ -133,6 +135,34 @@ THEOREM IndInvProof == Spec => []IndInv
           <4>1. CASE ASnd BY <3>1, <4>1 DEF IndInv, Inv, ASnd
           <4>2. CASE ARcv
             <5>1. CASE Head(BtoA) = AVar[2]
+                <6>1. \E d \in Data : AVar' = <<d, 1 - AVar[2]>> BY <4>2, <5>1 DEF ARcv
+                <6>2. UNCHANGED BVar BY <4>2, <5>1 DEF ARcv
+                <6>3. AVar'[2] = 1 - AVar[2] BY <6>1, <4>2, <5>1 DEF ARcv
+                <6>4. AVar[2] = 1 - AVar'[2] BY <6>3 DEF IndInv, TypeInv
+                <6>5. 1 - AVar'[2] = BVar[2]' => AVar = BVar' BY <6>2, <6>4 DEF IndInv, Inv
+                <6>6a Ordered(BtoA \o <<BVar[2]>> \o SecondElFromSeq(AtoB) \o <<AVar[2]>>) BY DEF IndInv, Toggle
+                <6>6b Ordered(<<Head(BtoA)>> \o Tail(BtoA) \o <<BVar[2]>> \o SecondElFromSeq(AtoB) \o <<AVar[2]>>) 
+                    <7>1. <<Head(BtoA)>> \o Tail(BtoA) = BtoA 
+                        <8>1. BtoA # << >> BY <4>2 DEF ARcv
+                        <8>2. BtoA \in Seq({0,1}) BY DEF IndInv, TypeInv
+                        <8> QED BY <8>1, <8>2, ConsHeadTail
+                    <7> QED BY <7>1, <6>6a
+                <6>c BVar[2] = AVar[2] 
+                    <7>1. Head(BtoA) \in Nat
+                        <8>1. BtoA # << >> BY <4>2 DEF ARcv                    
+                        <8> QED BY <8>1, HeadTailProperties DEF IndInv, TypeInv 
+                    <7>2. BVar[2] \in Nat BY DEF IndInv, TypeInv
+                    <7>3. Tail(BtoA) \in Seq(Nat)
+                        <8>1. BtoA # << >> BY <4>2 DEF ARcv
+                        <8> QED BY <8>1, HeadTailProperties DEF IndInv, TypeInv
+                    <7>4. SecondElFromSeq(AtoB) \in Seq(Nat) BY DEF IndInv, TypeInv, SecondElFromSeq
+                    <7> QED BY <6>6b, <5>1, <7>1, <7>2, <7>3, <7>4, MiddleTheorem           
+                <6>8. AVar'[2] = 1 -  BVar'[2] BY <6>c, <6>2, <6>3 DEF IndInv, Inv
+                <6>9. AVar'[2] # BVar'[2] 
+                    <7>1. AVar[2]' \in {0, 1} BY <6>3 DEF IndInv, TypeInv
+                    <7>2. BVar'[2]  \in {0, 1} BY <6>2 DEF IndInv, TypeInv
+                    <7> QED BY <6>8, <7>1, <7>2 
+                <6> QED BY <6>9 DEF IndInv, Inv, ARcv            
             <5>2. CASE Head(BtoA) # AVar[2]
                 <6>1. UNCHANGED AVar BY <4>2, <5>2 DEF ARcv
                 <6>2. UNCHANGED BVar BY <4>2, <5>2 DEF ARcv
@@ -141,6 +171,14 @@ THEOREM IndInvProof == Spec => []IndInv
           <4>3. CASE BSnd BY <3>1, <4>3 DEF IndInv, Inv, BSnd
           <4>4. CASE BRcv
             <5>1. CASE Head(AtoB)[2] # BVar[2]
+                <6>1. UNCHANGED AVar BY <4>4, <5>1 DEF BRcv
+                <6>2. BVar' = Head(AtoB) BY <4>4, <5>1 DEF BRcv
+                <6>3. \A i \in 1..Len(AtoB): (AtoB[i][2] = AVar[2] => AtoB[i] = AVar ) BY DEF IndInv, InvSend
+                <6>4. Head(AtoB)[2] = AVar[2] => AtoB[1] = AVar
+                    <7>1.  Len(AtoB) \in Nat \ {0}   BY <4>4, <5>1, EmptySeq DEF BRcv, IndInv, TypeInv
+                    <7> QED BY <6>3, <7>1
+                <6>5. BVar'[2] = AVar[2] => BVar' = AVar BY <6>2, <6>4 DEF Head
+                <6> QED BY <6>1, <6>5 DEF IndInv, Inv  
             <5>2. CASE Head(AtoB)[2] = BVar[2]
                 <6>1. UNCHANGED AVar BY <4>4, <5>2 DEF BRcv
                 <6>2. UNCHANGED BVar BY <4>4, <5>2 DEF BRcv
@@ -697,7 +735,7 @@ FairSpec == Spec  /\  SF_vars(ARcv) /\ SF_vars(BRcv) /\
                       WF_vars(ASnd) /\ WF_vars(BSnd)
 =============================================================================
 \* Modification History
-\* Last modified Wed Mar 05 16:30:20 CET 2025 by appeltwi
+\* Last modified Sun Apr 20 20:30:09 CEST 2025 by appeltwi
 \* Last modified Tue Dec 31 18:19:05 CET 2024 by appeltwi
 \* Last modified Wed Dec 27 13:29:51 PST 2017 by lamport
 \* Created Wed Mar 25 11:53:40 PDT 2015 by lamport

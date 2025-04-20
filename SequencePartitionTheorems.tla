@@ -22,7 +22,7 @@ THEOREM LesserTrans ==
           <2>2. CASE A < B BY DEF <
           <2>3. CASE A = B BY <2>3
           <2> QED BY <2>1, <2>2, <2>3
-
+          
 THEOREM OrderPartition ==
   ASSUME NEW S, NEW seq1 \in Seq(S), NEW seq2 \in Seq(S)
   PROVE  Ordered(seq1 \o seq2) => Ordered(seq1)
@@ -395,6 +395,23 @@ THEOREM OrderBracket ==
     <2>1. x = y OBVIOUS
     <2> QED  BY <1>1, <2>1 DEF Ordered
   <1> QED BY <1>1, <1>2
+  
+THEOREM MiddleTheorem ==   
+    ASSUME NEW seq1 \in Seq(Nat), NEW seq2 \in Seq(Nat), NEW x \in Nat, NEW y \in Nat, NEW m \in Nat, x = y
+    PROVE  Ordered(<<x>> \o seq1 \o <<m>> \o seq2 \o <<y>>)  =>   x = m /\ y = m
+  <1> SUFFICES ASSUME Ordered(<<x>> \o seq1 \o <<m>> \o seq2 \o <<y>>)
+               PROVE  x = m /\ y = m
+    OBVIOUS
+  <1>1. \A i \in 1..Len(seq1 \o <<m>> \o seq2): (seq1 \o <<m>> \o seq2)[i] = x
+    <2>1. (seq1 \o <<m>> \o seq2) \in Seq(Nat) OBVIOUS
+    <2>2. x \in Nat OBVIOUS
+    <2>3. y \in Nat OBVIOUS
+    <2>4. x = y OBVIOUS
+    <2>5. Ordered(<<x>> \o (seq1 \o <<m>> \o seq2) \o <<y>>) OBVIOUS
+    <2> QED BY <2>1, <2>2, <2>3, <2>4, <2>5, OrderBracket  
+  <1>2. (seq1 \o <<m>> \o seq2)[Len(seq1) + 1] = m BY ConcatProperties 
+  <1>3.  m = x BY <1>2, <1>1   
+  <1> QED BY <1>3
                                            
 THEOREM ConcatAssociative5 ==
   ASSUME NEW S, NEW s \in Seq(S), NEW t \in Seq(S), NEW u \in Seq(S), NEW v \in Seq(S), NEW w \in Seq(S)
@@ -405,5 +422,7 @@ THEOREM AppendProperties2 ==
   ASSUME NEW S, NEW seq \in Seq(S), NEW elt \in S
   PROVE  \A i \in 1.. Len(Append(seq, elt)) : IF i <= Len(seq) THEN Append(seq, elt)[i] = seq[i] ELSE Append(seq, elt)[Len(seq)+1] = elt
     <1> QED BY AppendProperties
+    
+
         
 =============================================================================
