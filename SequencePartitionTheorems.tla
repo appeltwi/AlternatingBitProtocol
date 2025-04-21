@@ -30,6 +30,31 @@ THEOREM OrderPartition ==
     <1>2. CASE Ordered2(seq1 \o seq2) BY <1>2 DEF Ordered, Ordered2
     <1>3. QED BY <1>1, <1>2 DEF Ordered
     
+THEOREM OrderPartitionL ==
+  ASSUME NEW S, NEW seq1 \in Seq(S), NEW seq2 \in Seq(S)
+  PROVE  Ordered(seq1 \o seq2) => Ordered(seq2)
+    <1>1. CASE Ordered1(seq1 \o seq2) 
+        <2>1. Ordered1(seq2)
+          <3> SUFFICES ASSUME NEW i \in 1..Len(seq2), NEW j \in 1..Len(seq2)
+                       PROVE  i <= j => seq2[i] <= seq2[j]
+            BY DEF Ordered1    
+          <3>3. i <= j => seq2[i] <= seq2[j] 
+            <4>1. i + Len(seq1) <= j + Len(seq1) => (seq1 \o seq2)[i + Len(seq1)] <= (seq1 \o seq2)[j + Len(seq1)] BY <1>1 DEF Ordered1
+            <4> QED BY <4>1   
+          <3> QED BY <3>3
+        <2> QED BY <2>1 DEF Ordered
+    <1>2. CASE Ordered2(seq1 \o seq2) 
+      <2>1. Ordered2(seq2)
+        <3> SUFFICES ASSUME NEW i \in 1..Len(seq2), NEW j \in 1..Len(seq2)
+                     PROVE  i <= j => seq2[i] >= seq2[j]
+          BY DEF Ordered2
+          <3>3. i <= j => seq2[i] >= seq2[j] 
+            <4>1. i + Len(seq1) <= j + Len(seq1) => (seq1 \o seq2)[i + Len(seq1)] >= (seq1 \o seq2)[j + Len(seq1)] BY <1>2 DEF Ordered2
+            <4> QED BY <4>1   
+          <3> QED BY <3>3
+      <2> QED  BY <2>1 DEF Ordered    
+    <1>3. QED BY <1>1, <1>2 DEF Ordered 
+    
 THEOREM OrderPartition1Middle ==
   ASSUME NEW x \in Nat, NEW y \in Nat, NEW seq1 \in Seq(Nat), \E i \in 1..Len(seq1): seq1[i] < y
   PROVE  Ordered1(<<x>> \o seq1 \o <<y>>) => x < y      
@@ -331,6 +356,10 @@ THEOREM OrderPartitionConcatElem2L ==
 THEOREM SeqComm ==
   ASSUME NEW S, NEW P, NEW seq \in Seq(S \X P),  seq # <<>>
   PROVE Head(seq)[2] = Head(SecondElFromSeq(seq)) BY DEF SecondElFromSeq
+  
+THEOREM SeqCommAll ==
+  ASSUME NEW S, NEW P, NEW seq \in Seq(S \X P),  seq # <<>>, NEW i \in 1..Len(seq)
+  PROVE seq[i][2] = SecondElFromSeq(seq)[i] BY DEF SecondElFromSeq
       
 THEOREM FirstInSet ==
     ASSUME NEW S, NEW seq \in Seq(S), seq # <<>>
@@ -412,6 +441,14 @@ THEOREM MiddleTheorem ==
   <1>2. (seq1 \o <<m>> \o seq2)[Len(seq1) + 1] = m BY ConcatProperties 
   <1>3.  m = x BY <1>2, <1>1   
   <1> QED BY <1>3
+  
+THEOREM MiddleTheoremAll ==   
+    ASSUME NEW seq1 \in Seq(Nat), NEW x \in Nat, NEW y \in Nat, x = y
+    PROVE  Ordered(<<x>> \o seq1 \o <<y>>)  => \A i \in 1..Len(seq1): seq1[i] = x
+  <1> SUFFICES ASSUME Ordered(<<x>> \o seq1 \o <<y>>)
+               PROVE  \A i \in 1..Len(seq1): seq1[i] = x
+    OBVIOUS
+  <1> QED
                                            
 THEOREM ConcatAssociative5 ==
   ASSUME NEW S, NEW s \in Seq(S), NEW t \in Seq(S), NEW u \in Seq(S), NEW v \in Seq(S), NEW w \in Seq(S)

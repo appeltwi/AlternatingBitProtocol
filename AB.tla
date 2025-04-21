@@ -87,13 +87,11 @@ CheckInv2 ==  \/ AtoB = << >>
 \* does not help us prove Invariant.
 Inv == (AVar[2] = BVar[2]) => (AVar = BVar)
 InvSend == \A i \in 1..Len(AtoB): (AtoB[i][2] = AVar[2] => AtoB[i] = AVar )
-InvSend2 == \A i \in 1..Len(BtoA): (BtoA[i] = AVar[2] => AVar[2] = BVar[2] )
 Toggle == Ordered(BtoA \o <<BVar[2]>> \o SecondElFromSeq(AtoB) \o <<AVar[2]>>)
 IndInv ==  /\ TypeInv
            /\ Inv
            /\ Toggle
            /\ InvSend
-           /\ InvSend2
            
 IndInv1 ==  /\ TypeInv
                /\ CheckInv1
@@ -220,7 +218,78 @@ THEOREM IndInvProof == Spec => []IndInv
                 <7> QED BY <5>7, <7>1, <7>2
               <6> QED BY <6>1, <6>2
             <5> QED BY <5>14, <5>3 DEF IndInv, InvSend, ASnd
-          <4>2. CASE ARcv BY <3>1, <4>2 DEF IndInv, InvSend, ARcv
+          <4>2. CASE ARcv
+            <5>1. CASE Head(BtoA) = AVar[2] 
+                <6>1. \E d \in Data : AVar' = <<d, 1 - AVar[2]>> BY <3>1, <4>2, <5>1 DEF ARcv
+                <6>2. AVar[2]' = 1 - AVar[2] BY <6>1
+                <6>3. UNCHANGED AtoB BY <3>1, <4>2, <5>1 DEF IndInv, InvSend, ARcv
+                <6>6a Ordered(BtoA \o <<BVar[2]>> \o SecondElFromSeq(AtoB) \o <<AVar[2]>>) BY DEF IndInv, Toggle
+                <6>6b Ordered(<<Head(BtoA)>> \o Tail(BtoA) \o <<BVar[2]>> \o SecondElFromSeq(AtoB) \o <<AVar[2]>>) 
+                    <7>1. <<Head(BtoA)>> \o Tail(BtoA) = BtoA 
+                        <8>1. BtoA # << >> BY <4>2 DEF ARcv
+                        <8>2. BtoA \in Seq({0,1}) BY DEF IndInv, TypeInv
+                        <8> QED BY <8>1, <8>2, ConsHeadTail
+                    <7> QED BY <7>1, <6>6a
+                <6>c BVar[2] = AVar[2] 
+                    <7>1. Head(BtoA) \in Nat
+                        <8>1. BtoA # << >> BY <4>2 DEF ARcv                    
+                        <8> QED BY <8>1, HeadTailProperties DEF IndInv, TypeInv 
+                    <7>2. BVar[2] \in Nat BY DEF IndInv, TypeInv
+                    <7>3. Tail(BtoA) \in Seq(Nat)
+                        <8>1. BtoA # << >> BY <4>2 DEF ARcv
+                        <8> QED BY <8>1, HeadTailProperties DEF IndInv, TypeInv
+                    <7>4. SecondElFromSeq(AtoB) \in Seq(Nat) BY DEF IndInv, TypeInv, SecondElFromSeq
+                    <7> QED BY <6>6b, <5>1, <7>1, <7>2, <7>3, <7>4, MiddleTheorem                  
+                <6>4. (\A i \in 1..Len(AtoB) : AtoB[i][2] = AVar[2] => AtoB[i] = AVar)'
+                  <7> SUFFICES ASSUME NEW i \in (1..Len(AtoB))'
+                               PROVE  (AtoB[i][2] = AVar[2] => AtoB[i] = AVar)'
+                    OBVIOUS
+                  <7>1. (AtoB[i][2] = AVar[2] => AtoB[i] = AVar) BY <6>3 DEF IndInv, InvSend
+                  <7>2. AVar[2] = 1 - AVar[2]' BY <6>2 DEF IndInv, TypeInv
+                  <7>3. AtoB[i][2] = AVar[2]
+                    <8>1. Ordered(<<BVar[2]>> \o SecondElFromSeq(AtoB) \o <<AVar[2]>>)
+                        <9>1. BtoA  \in Seq(Nat) BY DEF IndInv, TypeInv 
+                        <9>2. <<BVar[2]>> \o SecondElFromSeq(AtoB) \o <<AVar[2]>> \in Seq(Nat) BY DEF IndInv, TypeInv, SecondElFromSeq
+                        <9>3. Ordered(BtoA \o (<<BVar[2]>> \o SecondElFromSeq(AtoB) \o <<AVar[2]>>)) 
+                            <10>1. BtoA \o (<<BVar[2]>> \o SecondElFromSeq(AtoB) \o <<AVar[2]>>) = BtoA \o (<<BVar[2]>> \o SecondElFromSeq(AtoB)) \o <<AVar[2]>>
+                                <11>1. <<BVar[2]>> \o SecondElFromSeq(AtoB) \in Seq(Nat) BY DEF IndInv, TypeInv, SecondElFromSeq
+                                <11>2. <<AVar[2]>> \in Seq(Nat) BY DEF IndInv, TypeInv 
+                                <11> QED BY <9>1, <11>1, <11>2, ConcatAssociative
+                            <10>2. BtoA \o (<<BVar[2]>> \o SecondElFromSeq(AtoB)) = BtoA \o <<BVar[2]>> \o SecondElFromSeq(AtoB)
+                                <11>2. <<BVar[2]>> \in Seq(Nat) BY DEF IndInv, TypeInv
+                                <11>3. SecondElFromSeq(AtoB) \in Seq(Nat) BY DEF IndInv, TypeInv, SecondElFromSeq
+                                <11> QED BY <9>1, <11>2, <11>3, ConcatAssociative
+                            <10> QED BY <6>6a, <10>1, <10>2 
+                        <9> QED BY  <9>3, <9>1, <9>2, OrderPartitionL
+                    <8>2. SecondElFromSeq(AtoB) \in Seq(Nat) BY DEF IndInv, TypeInv, SecondElFromSeq
+                    <8>3. BVar[2] \in Nat BY DEF IndInv, TypeInv
+                    <8>4. AVar[2] \in Nat BY DEF IndInv, TypeInv
+                    <8>5.  AtoB[i][2] = SecondElFromSeq(AtoB)[i]
+                        <9>1. AtoB # << >>   BY <3>1, <4>2, <5>1 DEF ARcv
+                        <9>2. i \in DOMAIN AtoB 
+                            <10>1. AtoB \in Seq(Data \X {0,1}) BY DEF IndInv, TypeInv
+                            <10>2. i \in 1 .. Len(AtoB) BY <6>3
+                            <10> QED BY LenProperties, <10>1, <10>2
+                        <9>3. AtoB \in Seq(Data \X {0,1}) BY DEF IndInv, TypeInv
+                        <9> QED BY <9>1, <9>2, <9>3, SeqCommAll
+                    <8>6. i \in 1..Len(SecondElFromSeq(AtoB)) 
+                        <9>1. i \in DOMAIN SecondElFromSeq(AtoB) 
+                            <10>1. i \in DOMAIN AtoB 
+                                <11>1. AtoB \in Seq(Data \X {0,1}) BY DEF IndInv, TypeInv
+                                <11>2. i \in 1 .. Len(AtoB) BY <6>3
+                                <11> QED BY <11>1, <11>2, LenProperties 
+                            <10> QED BY <10>1 DEF SecondElFromSeq 
+                        <9>2. SecondElFromSeq(AtoB) \in Seq({0, 1}) BY DEF IndInv, TypeInv, SecondElFromSeq 
+                        <9> QED BY <9>1, <9>2, LenProperties DEF SecondElFromSeq
+                    <8> QED BY <8>1, <8>2, <8>3, <8>4, <8>5, <8>6, <6>c, OrderBracket
+                  <7>4. AtoB'[i][2] # AVar'[2]
+                    <8>1. AtoB[i] = AVar BY <7>3, <7>1
+                    <8>2. AtoB'[i][2] # AVar'[2] BY <7>3, <6>2, <6>3 DEF IndInv, TypeInv
+                    <8> QED BY <7>3, <7>1, <8>2                 
+                  <7> QED BY <7>3, <7>4
+                <6> QED BY <6>4 DEF IndInv, InvSend
+            <5>2. CASE Head(BtoA) # AVar[2] BY <3>1, <4>2, <5>1 DEF IndInv, InvSend, ARcv
+            <5> QED BY <3>1, <4>2, <5>1, <5>2 DEF IndInv, InvSend, ARcv
           <4>3. CASE BSnd BY <3>1, <4>3 DEF IndInv, InvSend, BSnd
           <4>4. CASE BRcv BY <3>1, <4>4 DEF IndInv, InvSend, BRcv
           <4>5. CASE LoseMsg BY <3>1, <4>5 DEF IndInv, InvSend, LoseMsg, Remove2
@@ -735,7 +804,7 @@ FairSpec == Spec  /\  SF_vars(ARcv) /\ SF_vars(BRcv) /\
                       WF_vars(ASnd) /\ WF_vars(BSnd)
 =============================================================================
 \* Modification History
-\* Last modified Sun Apr 20 20:30:09 CEST 2025 by appeltwi
+\* Last modified Mon Apr 21 17:20:03 CEST 2025 by appeltwi
 \* Last modified Tue Dec 31 18:19:05 CET 2024 by appeltwi
 \* Last modified Wed Dec 27 13:29:51 PST 2017 by lamport
 \* Created Wed Mar 25 11:53:40 PDT 2015 by lamport
