@@ -442,13 +442,6 @@ THEOREM MiddleTheorem ==
   <1>3.  m = x BY <1>2, <1>1   
   <1> QED BY <1>3
   
-THEOREM MiddleTheoremAll ==   
-    ASSUME NEW seq1 \in Seq(Nat), NEW x \in Nat, NEW y \in Nat, x = y
-    PROVE  Ordered(<<x>> \o seq1 \o <<y>>)  => \A i \in 1..Len(seq1): seq1[i] = x
-  <1> SUFFICES ASSUME Ordered(<<x>> \o seq1 \o <<y>>)
-               PROVE  \A i \in 1..Len(seq1): seq1[i] = x
-    OBVIOUS
-  <1> QED
                                            
 THEOREM ConcatAssociative5 ==
   ASSUME NEW S, NEW s \in Seq(S), NEW t \in Seq(S), NEW u \in Seq(S), NEW v \in Seq(S), NEW w \in Seq(S)
