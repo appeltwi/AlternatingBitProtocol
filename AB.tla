@@ -1,5 +1,5 @@
 --------------------------------- MODULE AB ---------------------------------
-EXTENDS Naturals, Sequences, FiniteSets, SequencesExt, SequenceTheorems, NaturalsInduction, SequencesExtTheorems, SequencePartitionTheorems
+EXTENDS Naturals, Sequences, FiniteSets, SequencesExt, SequenceTheorems, NaturalsInduction, SequencesExtTheorems, SequencePartitionTheorems, FiniteSetTheorems
 
 CONSTANT Data
 
@@ -7,9 +7,8 @@ CONSTANT Data
 (* We first define Remove(i, seq) to be the sequence obtained by removing  *)
 (* element number i from sequence seq.                                     *)
 (***************************************************************************)
-Remove2(i, seq) == 
-  [j \in 1..(Len(seq)-1) |-> IF j < i THEN seq[j] 
-                                      ELSE seq[j+1]]                                         
+(*use RemoveAt instead?*)
+Remove2(i, seq) == RemoveAt(seq, i)                                      
 
 VARIABLES BVar, AVar,  \* The same as in module ABSpec
           AtoB,  \* The sequence of data messages in transit from sender to receiver.
@@ -124,7 +123,7 @@ THEOREM IndInvProof == Spec => []IndInv
           <4>2. CASE ARcv BY <3>1, <4>2 DEF IndInv, TypeInv, ARcv
           <4>3. CASE BSnd BY <3>1, <4>3 DEF IndInv, TypeInv, BSnd
           <4>4. CASE BRcv BY <3>1, <4>4 DEF IndInv, TypeInv, BRcv
-          <4>5. CASE LoseMsg BY <3>1, <4>5 DEF IndInv, TypeInv, LoseMsg, Remove2
+          <4>5. CASE LoseMsg BY <3>1, <4>5, RemoveAtProperties DEF IndInv, TypeInv, LoseMsg, Remove2
           <4> QED BY <3>1, <4>1, <4>2, <4>3, <4>4, <4>5 DEF Next
         <3>2. CASE UNCHANGED vars BY <3>2 DEF IndInv, TypeInv, vars
         <3> QED BY <3>1, <3>2
@@ -188,6 +187,27 @@ THEOREM IndInvProof == Spec => []IndInv
         <3> QED BY <3>1, <3>2      
       <2>3. Toggle'
         <3>1. CASE Next
+          <4>1. CASE ASnd
+            <5>1.  AtoB' = Append(AtoB, AVar) BY <3>1, <4>1 DEF IndInv, Toggle, ASnd
+            <5>2. Append(AtoB, AVar) = AtoB \o <<AVar>>
+                <6>1. AVar \in  Data \X {0,1} BY DEF IndInv, TypeInv
+                <6>2. AtoB \in Seq(Data \X {0,1}) BY DEF IndInv, TypeInv
+                <6> QED BY <6>1, <6>2, AppendIsConcat
+            <5>3. SecondElFromSeq(AtoB)' = SecondElFromSeq(AtoB \o <<AVar>>)  BY <5>1, <5>2
+            <5>4. SecondElFromSeq(AtoB \o <<AVar>>) = SecondElFromSeq(AtoB ) \o <<AVar[2]>>
+                <6>1. AVar \in  Data \X {0,1} BY DEF IndInv, TypeInv
+                <6>2. AtoB \in Seq(Data \X {0,1}) BY DEF IndInv, TypeInv            
+                <6> QED BY <6>1, <6>2, SecondSeqConcat
+            <5>5. BtoA \o <<BVar[2]>> \o (SecondElFromSeq(AtoB) \o <<AVar[2]>>)' = BtoA \o <<BVar[2]>> \o (SecondElFromSeq(AtoB ) \o <<AVar[2]>> \o <<AVar[2]>>)
+                <6> QED BY <5>3, <5>4, <3>1, <4>1 DEF IndInv, Toggle, ASnd
+            <5>6. BtoA \o <<BVar[2]>> \o (SecondElFromSeq(AtoB ) \o <<AVar[2]>> \o <<AVar[2]>>) = BtoA \o <<BVar[2]>> \o SecondElFromSeq(AtoB ) \o <<AVar[2]>> \o <<AVar[2]>> BY ConcatAssociative
+            <5> QED BY <3>1, <4>1 DEF IndInv, Toggle, ASnd
+          <4>2. CASE ARcv BY <3>1, <4>2 DEF IndInv, Toggle, ARcv
+          <4>3. CASE BSnd BY <3>1, <4>3 DEF IndInv, Toggle, BSnd
+          <4>4. CASE BRcv BY <3>1, <4>4 DEF IndInv, Toggle, BRcv
+          <4>5. CASE LoseMsg BY <3>1, <4>5 DEF IndInv, TypeInv, BRcv
+          <4>6. QED
+            BY <3>1, <4>1, <4>2, <4>3, <4>4, <4>5 DEF Next
         <3>2. CASE UNCHANGED vars BY <3>2 DEF IndInv, Toggle, vars
         <3> QED BY <3>1, <3>2      
       <2>4. InvSend'
@@ -291,8 +311,96 @@ THEOREM IndInvProof == Spec => []IndInv
             <5>2. CASE Head(BtoA) # AVar[2] BY <3>1, <4>2, <5>1 DEF IndInv, InvSend, ARcv
             <5> QED BY <3>1, <4>2, <5>1, <5>2 DEF IndInv, InvSend, ARcv
           <4>3. CASE BSnd BY <3>1, <4>3 DEF IndInv, InvSend, BSnd
-          <4>4. CASE BRcv BY <3>1, <4>4 DEF IndInv, InvSend, BRcv
-          <4>5. CASE LoseMsg BY <3>1, <4>5 DEF IndInv, InvSend, LoseMsg, Remove2
+          <4>4. CASE BRcv
+            <5>1. UNCHANGED AVar BY <4>4 DEF BRcv
+            <5>3. UNCHANGED BtoA BY <4>4 DEF BRcv
+            <5>4. AtoB' = Tail(AtoB)  BY <4>4, <5>1 DEF BRcv
+            <5>5. (\A i \in 1..Len(AtoB) : AtoB[i][2] = AVar[2] => AtoB[i] = AVar)' 
+              <6> SUFFICES ASSUME NEW i \in (1..Len(AtoB))'
+                           PROVE  (AtoB[i][2] = AVar[2] => AtoB[i] = AVar)'
+                OBVIOUS
+              <6>1. AtoB[i+1][2] = AVar[2] => AtoB[i+1] = AVar 
+                <7>1. AtoB \in Seq(Data \X {0,1}) BY DEF IndInv, TypeInv
+                <7>2. AtoB # << >> BY <3>1, <4>4, <5>1 DEF BRcv
+                <7> QED BY <5>4, <7>1, <7>2, HeadTailProperties DEF IndInv, InvSend, BRcv
+              <6>3. AtoB'[i][2] = AVar'[2] => AtoB'[i] = AVar'
+                <7>1. AtoB \in Seq(Data \X {0,1}) BY DEF IndInv, TypeInv
+                <7>2. AtoB # << >> BY <3>1, <4>4, <5>1, <5>1 DEF BRcv                  
+                <7>3. AtoB'[i] = AtoB[i + 1] BY HeadTailProperties, <7>1, <7>2, <5>4
+                <7>4. AtoB'[i][2] = AVar[2] => AtoB'[i] = AVar BY <6>1, <7>3
+                <7> QED BY <7>4, <5>1
+              <6> QED BY <6>3
+            <5> QED BY <5>5 DEF IndInv, InvSend, BRcv                             
+          <4>5. CASE LoseMsg
+            <5>1. CASE /\ \E i \in 1..Len(AtoB): 
+                               AtoB' = Remove2(i, AtoB)
+                       /\ BtoA' = BtoA 
+              <6> SUFFICES ASSUME NEW i \in 1..Len(AtoB),
+                                  AtoB' = Remove2(i, AtoB)
+                           PROVE  InvSend'
+                BY <5>1 
+              <6>2. (\A j \in 1..Len(AtoB) : AtoB[j][2] = AVar[2] => AtoB[j] = AVar)'             
+                <7> SUFFICES ASSUME NEW j \in (1..Len(AtoB))'
+                             PROVE  (AtoB[j][2] = AVar[2] => AtoB[j] = AVar)'
+                  OBVIOUS
+                  <7>1. AtoB[j][2] = AVar[2] => AtoB[j] = AVar 
+                    <8>1. j \in 1..Len(AtoB)
+                        <9>1. Len(AtoB') = Len(AtoB) - 1 
+                            <10>1. AtoB  \in Seq(Data \X {0,1}) BY DEF IndInv, TypeInv
+                            <10> QED BY RemoveAtProperties, <10>1 DEF Remove2
+                        <9>4. Len(AtoB') \in Nat BY LenProperties, RemoveAtProperties DEF IndInv, TypeInv, Remove2
+                        <9>5. Len(AtoB) \in Nat BY LenProperties DEF IndInv, TypeInv     
+                        <9>6. Len(AtoB') < Len(AtoB) BY <9>1, <9>4, <9>5                   
+                        <9> QED BY <9>4, <9>5, <9>6
+                    <8> QED BY <8>1 DEF IndInv, InvSend  
+                  <7>1b. AtoB[j + 1][2] = AVar[2] => AtoB[j + 1] = AVar 
+                    <8>1. j + 1 \in 1..Len(AtoB)
+                        <9>1. Len(AtoB') = Len(AtoB) - 1 
+                            <10>1. AtoB  \in Seq(Data \X {0,1}) BY DEF IndInv, TypeInv
+                            <10> QED BY RemoveAtProperties, <10>1 DEF Remove2
+                        <9>4. Len(AtoB') \in Nat BY LenProperties, RemoveAtProperties DEF IndInv, TypeInv, Remove2
+                        <9>5. Len(AtoB) \in Nat BY LenProperties DEF IndInv, TypeInv     
+                        <9>6. Len(AtoB') < Len(AtoB) BY <9>1, <9>4, <9>5                   
+                        <9> QED BY <9>4, <9>5, <9>6
+                    <8> QED BY <8>1 DEF IndInv, InvSend                     
+                <7>2. CASE j < i
+                    <8>1. AtoB'[j] = AtoB[j] 
+                        <9>1. i \in 1..Len(AtoB) OBVIOUS
+                        <9>2. AtoB  \in Seq(Data \X {0,1}) BY DEF IndInv, TypeInv
+                        <9> QED BY RemoveAtProperties, <7>2, <9>1, <9>2 DEF Remove2
+                    <8>3. AtoB'[j][2] = AVar[2] => AtoB[j]' = AVar BY <8>1, <7>1      
+                    <8>4. UNCHANGED AVar BY <4>5 DEF LoseMsg 
+                    <8>5. UNCHANGED BVar BY <4>5 DEF LoseMsg         
+                    <8> QED BY <8>3, <8>4, <8>5
+                <7>3. CASE j >= i
+                    <8>1. AtoB'[j] = AtoB[j + 1]
+                        <9>1. i \in 1..Len(AtoB) OBVIOUS
+                        <9>2. AtoB  \in Seq(Data \X {0,1}) BY DEF IndInv, TypeInv
+                        <9> QED BY RemoveAtProperties, <7>3, <9>1, <9>2 DEF Remove2                    
+                    <8>3. AtoB'[j][2] = AVar[2] => AtoB[j]' = AVar BY <8>1, <7>1b       
+                    <8>4. UNCHANGED AVar BY <4>5 DEF LoseMsg 
+                    <8>5. UNCHANGED BVar BY <4>5 DEF LoseMsg         
+                    <8> QED BY <8>3, <8>4, <8>5
+                <7> QED BY <7>2, <7>3
+              <6> QED BY <6>2 DEF IndInv, InvSend
+            <5>2. CASE /\ \E i \in 1..Len(BtoA): 
+                               BtoA' = Remove2(i, BtoA)
+                       /\ AtoB' = AtoB
+              <6> SUFFICES ASSUME NEW i \in (1..Len(AtoB))'
+                           PROVE  (AtoB[i][2] = AVar[2] => AtoB[i] = AVar)'
+                BY <5>2 DEF InvSend 
+              <6>1. (\A j \in 1..Len(AtoB) : AtoB[j][2] = AVar[2] => AtoB[j] = AVar)'
+                <7> SUFFICES ASSUME NEW j \in (1..Len(AtoB))'
+                             PROVE  (AtoB[j][2] = AVar[2] => AtoB[j] = AVar)'
+                  OBVIOUS
+                  <7>1. UNCHANGED AtoB BY <5>2 DEF LoseMsg    
+                  <7>2. UNCHANGED AVar BY <4>5 DEF LoseMsg
+                  <7>3. UNCHANGED BVar BY <4>5 DEF LoseMsg              
+                <7> QED BY <7>1, <7>2, <7>3 DEF IndInv, InvSend
+              <6> QED BY <6>1
+            <5>3. UNCHANGED AVar BY <4>5 DEF LoseMsg
+            <5>4. UNCHANGED BVar BY <4>5 DEF LoseMsg
+            <5> QED BY <4>5, <5>1, <5>2, <5>3, <5>4 DEF LoseMsg
           <4>6. QED
             BY <3>1, <4>1, <4>2, <4>3, <4>4, <4>5 DEF Next
         <3>2. CASE UNCHANGED vars BY <3>2 DEF IndInv, InvSend, vars
@@ -804,7 +912,7 @@ FairSpec == Spec  /\  SF_vars(ARcv) /\ SF_vars(BRcv) /\
                       WF_vars(ASnd) /\ WF_vars(BSnd)
 =============================================================================
 \* Modification History
-\* Last modified Mon Apr 21 17:20:03 CEST 2025 by appeltwi
+\* Last modified Sun May 18 18:45:19 CEST 2025 by appeltwi
 \* Last modified Tue Dec 31 18:19:05 CET 2024 by appeltwi
 \* Last modified Wed Dec 27 13:29:51 PST 2017 by lamport
 \* Created Wed Mar 25 11:53:40 PDT 2015 by lamport

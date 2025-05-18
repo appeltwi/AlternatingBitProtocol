@@ -360,6 +360,11 @@ THEOREM SeqComm ==
 THEOREM SeqCommAll ==
   ASSUME NEW S, NEW P, NEW seq \in Seq(S \X P),  seq # <<>>, NEW i \in 1..Len(seq)
   PROVE seq[i][2] = SecondElFromSeq(seq)[i] BY DEF SecondElFromSeq
+  
+THEOREM SecondSeqConcat == 
+  ASSUME NEW S, NEW P, NEW seq \in Seq(S \X P), NEW elt \in S \X P
+  PROVE SecondElFromSeq(seq \o <<elt>>) = SecondElFromSeq(seq) \o <<elt[2]>>
+    <1> QED BY DEF SecondElFromSeq
       
 THEOREM FirstInSet ==
     ASSUME NEW S, NEW seq \in Seq(S), seq # <<>>
